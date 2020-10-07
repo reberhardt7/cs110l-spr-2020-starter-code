@@ -1,0 +1,13 @@
+/deet/.cargo/
+/deet/target/
+/deet/Cargo.lock
+.*.swp
+.deet_history
+.bash_history
+/deet/samples/sleepy_print
+/deet/samples/segfault
+/deet/samples/hello
+/deet/samples/function_calls
+/deet/samples/exit
+/deet/samples/count
+.idea

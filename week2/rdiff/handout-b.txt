@@ -1,0 +1,6 @@
+You'll be learning and practicing a lot of new Rust concepts this week by
+writing some programs that have more sophisticated logic that what you saw last
+with last week's exercises. The first exercise is a warm-up: to implement the wc
+command line utility in Rust. The second exercise is more challenging: to
+implement the diff utility. In order to do so, you'll first find the longest
+subsequence that is common.

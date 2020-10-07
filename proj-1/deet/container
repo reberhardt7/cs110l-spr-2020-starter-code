@@ -1,0 +1,23 @@
+#! /bin/bash
+
+# Kill the existing deet container if one is running
+docker rm -f deet &>/dev/null
+
+# Start a container
+docker run \
+    `# Give the container a name (so that it's easier to attach to with "docker exec")` \
+    --name deet \
+    `# Mount the current directory inside of the container, so cargo can access it` \
+    -v "${PWD}":/deet \
+    `# Set the container user's home directory to our deet directory` \
+    -e HOME=/deet \
+    `# Run as the current user (instead of root)` \
+    -u $(id -u ${USER}):$(id -g ${USER}) \
+    `# Allow ptrace` \
+    --cap-add=SYS_PTRACE \
+    `# When the container exits, automatically clean up the files it leaves behind` \
+    --rm \
+    `# Get an interactive terminal` \
+    -it \
+    `# Run the deet image` \
+    deet "$@"

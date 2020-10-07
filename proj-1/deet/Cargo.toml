@@ -1,0 +1,16 @@
+[package]
+name = "deet"
+version = "0.1.0"
+authors = ["Ryan Eberhardt <reberhardt7@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nix = "0.17.0"
+libc = "0.2.68"
+rustyline = "6.1.2"
+gimli = { git = "https://github.com/gimli-rs/gimli", rev = "ad23cdb2", default-features = false, features = ["read"] }
+object = { version = "0.17", default-features = false, features = ["read"] }
+memmap = "0.7"
+addr2line = "0.11.0"

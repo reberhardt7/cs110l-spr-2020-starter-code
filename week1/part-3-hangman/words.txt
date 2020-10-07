@@ -1,0 +1,9 @@
+immutable
+borrowed
+shared
+reference
+aluminum
+oxidation
+lobster
+starfish
+crawfish

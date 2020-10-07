@@ -1,0 +1,8 @@
+This week's exercises will continue easing you into Rust and will feature some
+components of object-oriented Rust that we're covering this week. You'll be
+writing some programs that have more sophisticated logic that what you saw last
+with last week's exercises. The first exercise is a warm-up: to implement the wc
+command line utility in Rust. The second exercise is more challenging: to
+implement the diff utility. In order to do so, you'll first find the longest
+common subsequence (LCS) of lines between the two files and use this to inform
+how you display your diff.
