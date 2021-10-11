@@ -17,7 +17,7 @@ struct CmdOptions {
         default_value = "0.0.0.0:1100"
     )]
     bind: String,
-    #[clap(short, long, about = "Upstream host to forward requests to")]
+    #[clap(short, long, multiple_occurrences = true, about = "Upstream host to forward requests to")]
     upstream: Vec<String>,
     #[clap(
         long,
