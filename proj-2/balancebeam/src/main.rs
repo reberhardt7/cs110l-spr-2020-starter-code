@@ -1,13 +1,13 @@
 mod request;
 mod response;
 
-use clap::Clap;
+use clap::Parser;
 use rand::{Rng, SeedableRng};
 use std::net::{TcpListener, TcpStream};
 
 /// Contains information parsed from the command-line invocation of balancebeam. The Clap macros
 /// provide a fancy way to automatically construct a command-line argument parser.
-#[derive(Clap, Debug)]
+#[derive(Parser, Debug)]
 #[clap(about = "Fun with load balancing")]
 struct CmdOptions {
     #[clap(
