@@ -6,16 +6,33 @@ fn main() {
     println!("Hi! Try running \"cargo test\" to run tests.");
 }
 
+#[allow(dead_code)]
 fn add_n(v: Vec<i32>, n: i32) -> Vec<i32> {
-    unimplemented!()
+    let mut new_v = Vec::new();
+    for i in v {
+        new_v.push(i + n);
+    }
+    new_v
 }
 
+#[allow(dead_code)]
 fn add_n_inplace(v: &mut Vec<i32>, n: i32) {
-    unimplemented!()
+    for i in 0..v.len() {
+        v[i] += n;
+    }
 }
 
+#[allow(dead_code)]
 fn dedup(v: &mut Vec<i32>) {
-    unimplemented!()
+    let mut set = HashSet::new();
+    let mut new_v = Vec::new();
+    for i in v.clone() {
+        if set.insert(i) {
+            new_v.push(i);
+        }
+    }
+
+    *v = new_v;
 }
 
 #[cfg(test)]
