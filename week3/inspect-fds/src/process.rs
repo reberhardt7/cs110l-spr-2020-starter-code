@@ -10,7 +10,6 @@ pub struct Process {
 }
 
 impl Process {
-    #[allow(unused)] // TODO: delete this line for Milestone 1
     pub fn new(pid: usize, ppid: usize, command: String) -> Process {
         Process { pid, ppid, command }
     }
@@ -20,22 +19,58 @@ impl Process {
     /// information will commonly be unavailable if the process has exited. (Zombie processes
     /// still have a pid, but their resources have already been freed, including the file
     /// descriptor table.)
-    #[allow(unused)] // TODO: delete this line for Milestone 3
     pub fn list_fds(&self) -> Option<Vec<usize>> {
-        // TODO: implement for Milestone 3
-        unimplemented!();
+        let path = format!("/proc/{}/fd", self.pid);
+        let mut fds = Vec::new();
+
+        for i in fs::read_dir(path).ok()? {
+            let x = i
+                .ok()?
+                .file_name()
+                .into_string()
+                .ok()?
+                .parse::<usize>()
+                .ok()?;
+            fds.push(x);
+        }
+
+        Some(fds)
     }
 
     /// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
     /// information is available (it returns None otherwise). The information is commonly
     /// unavailable if the process has already exited.
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn list_open_files(&self) -> Option<Vec<(usize, OpenFile)>> {
         let mut open_files = vec![];
         for fd in self.list_fds()? {
             open_files.push((fd, OpenFile::from_fd(self.pid, fd)?));
         }
         Some(open_files)
+    }
+
+    pub fn print(&self) {
+        println!(
+            "======== {} (pid {}, ppid {}) ========",
+            self.command, self.pid, self.ppid
+        );
+
+        match self.list_open_files() {
+            None => println!("Warning: could not inspect file descriptors for this process! \
+                                 It might have exited just as we were about to look at its fd table, \
+                                 or it might have exited a while ago and is waiting for the parent \
+                                 to reap it."),
+            Some(open_files) => {
+                for (fd, file) in open_files {
+                    println!(
+                        "{:<4} {:<15} cursor: {:<4} {}",
+                        fd,
+                        format!("({})", file.access_mode),
+                        file.cursor,
+                        file.colorized_name(),
+                    );
+                }
+            }
+        }
     }
 }
 
