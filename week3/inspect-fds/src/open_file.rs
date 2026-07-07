@@ -4,11 +4,8 @@ use std::hash::{Hash, Hasher};
 #[allow(unused_imports)] // TODO: delete this line for Milestone 4
 use std::{fmt, fs};
 
-#[allow(unused)] // TODO: delete this line for Milestone 4
 const O_WRONLY: usize = 00000001;
-#[allow(unused)] // TODO: delete this line for Milestone 4
 const O_RDWR: usize = 00000002;
-#[allow(unused)] // TODO: delete this line for Milestone 4
 const COLORS: [&str; 6] = [
     "\x1B[38;5;9m",
     "\x1B[38;5;10m",
@@ -17,12 +14,10 @@ const COLORS: [&str; 6] = [
     "\x1B[38;5;13m",
     "\x1B[38;5;14m",
 ];
-#[allow(unused)] // TODO: delete this line for Milestone 4
 const CLEAR_COLOR: &str = "\x1B[0m";
 
 /// This enum can be used to represent whether a file is read-only, write-only, or read/write. An
 /// enum is basically a value that can be one of some number of "things."
-#[allow(unused)] // TODO: delete this line for Milestone 4
 #[derive(Debug, Clone, PartialEq)]
 pub enum AccessMode {
     Read,
@@ -53,7 +48,6 @@ pub struct OpenFile {
 }
 
 impl OpenFile {
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn new(name: String, cursor: usize, access_mode: AccessMode) -> OpenFile {
         OpenFile {
             name,
@@ -68,7 +62,6 @@ impl OpenFile {
     /// * For regular files, this will simply return the supplied path.
     /// * For terminals (files starting with /dev/pts), this will return "<terminal>".
     /// * For pipes (filenames formatted like pipe:[pipenum]), this will return "<pipe #pipenum>".
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     fn path_to_name(path: &str) -> String {
         if path.starts_with("/dev/pts/") {
             String::from("<terminal>")
@@ -84,7 +77,6 @@ impl OpenFile {
     /// extracts the cursor position of that file descriptor (technically, the position of the
     /// open file table entry that the fd points to) using a regex. It returns None if the cursor
     /// couldn't be found in the fdinfo text.
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     fn parse_cursor(fdinfo: &str) -> Option<usize> {
         // Regex::new will return an Error if there is a syntactical error in our regular
         // expression. We call unwrap() here because that indicates there's an obvious problem with
@@ -103,7 +95,6 @@ impl OpenFile {
     /// This file takes the contents of /proc/{pid}/fdinfo/{fdnum} for some file descriptor and
     /// extracts the access mode for that open file using the "flags:" field contained in the
     /// fdinfo text. It returns None if the "flags" field couldn't be found.
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     fn parse_access_mode(fdinfo: &str) -> Option<AccessMode> {
         // Regex::new will return an Error if there is a syntactical error in our regular
         // expression. We call unwrap() here because that indicates there's an obvious problem with
@@ -134,11 +125,17 @@ impl OpenFile {
     /// program and we don't need to do fine-grained error handling, so returning Option is a
     /// simple way to indicate that "hey, we weren't able to get the necessary information"
     /// without making a big deal of it.)
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn from_fd(pid: usize, fd: usize) -> Option<OpenFile> {
-        // TODO: implement for Milestone 4
-        unimplemented!();
-    }
+    let path1 = format!("/proc/{}/fd/{}", pid, fd);
+    let path = fs::read_link(path1).ok()?;
+    let path01 = path.to_str()?;
+    let name = Self::path_to_name(path01);
+    let path2 = format!("/proc/{}/fdinfo/{}",pid,fd);
+    let path02 = fs::read_to_string(path2).ok()?;
+    let cursor = Self::parse_cursor(&path02)?;
+    let mode = Self::parse_access_mode(&path02)?;
+    Some(OpenFile::new(name,cursor,mode))
+}
 
     /// This function returns the OpenFile's name with ANSI escape codes included to colorize
     /// pipe names. It hashes the pipe name so that the same pipe name will always result in the

@@ -1,7 +1,6 @@
 use crate::open_file::OpenFile;
-#[allow(unused)] // TODO: delete this line for Milestone 3
 use std::fs;
-
+use std::fmt;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Process {
     pub pid: usize,
@@ -10,7 +9,6 @@ pub struct Process {
 }
 
 impl Process {
-    #[allow(unused)] // TODO: delete this line for Milestone 1
     pub fn new(pid: usize, ppid: usize, command: String) -> Process {
         Process { pid, ppid, command }
     }
@@ -20,16 +18,35 @@ impl Process {
     /// information will commonly be unavailable if the process has exited. (Zombie processes
     /// still have a pid, but their resources have already been freed, including the file
     /// descriptor table.)
-    #[allow(unused)] // TODO: delete this line for Milestone 3
-    pub fn list_fds(&self) -> Option<Vec<usize>> {
-        // TODO: implement for Milestone 3
-        unimplemented!();
+   pub fn list_fds(&self) -> Option<Vec<usize>> {
+    let mut fds = vec![];
+
+        let status_path = format!("/proc/{}/status", self.pid);
+    if let Ok(content) = std::fs::read_to_string(status_path) {
+        if content.contains("State:\tZ") {
+            return None;
+        }
+    } else {
+        return None;     }
+
+    let path = format!("/proc/{}/fd", self.pid);
+
+    let fdtables = std::fs::read_dir(path).ok()?;
+
+    for fd in fdtables {
+        if let Ok(fd) = fd {
+            if let Some(name) = fd.file_name().to_str() {
+                if let Ok(num) = name.parse::<usize>() {
+                    fds.push(num);
+                }
+            }
+        }
     }
 
-    /// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
+    Some(fds)
+}/// This function returns a list of (fdnumber, OpenFile) tuples, if file descriptor
     /// information is available (it returns None otherwise). The information is commonly
     /// unavailable if the process has already exited.
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn list_open_files(&self) -> Option<Vec<(usize, OpenFile)>> {
         let mut open_files = vec![];
         for fd in self.list_fds()? {
@@ -37,8 +54,38 @@ impl Process {
         }
         Some(open_files)
     }
+    pub fn print(&self){
+        println!("========== \"{}\"{}==========",self.command,self);
+        match self.list_open_files() {
+    None => println!(
+        "Warning: could not inspect file descriptors for this process! \
+            It might have exited just as we were about to look at its fd table, \
+            or it might have exited a while ago and is waiting for the parent \
+            to reap it."
+    ),
+    Some(open_files) => {
+        for (fd, file) in open_files {
+            println!(
+                "{:<4} {:<15} cursor: {:<4} {}",
+                fd,
+                format!("({})", file.access_mode),
+                file.cursor,
+                file.colorized_name(),
+            );
+        }
+    }
+}
+    }
 }
 
+impl fmt::Display for Process{
+fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+
+write!(f, "(pid {},ppid {})", self.pid, self.ppid)
+
+
+}
+}
 #[cfg(test)]
 mod test {
     use crate::ps_utils;
